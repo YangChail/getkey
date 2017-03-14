@@ -38,7 +38,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.mchz.getkey.GetKeyMain.main</mainClass>
+							<mainClass>com.mchz.getkey.GetKeyMain</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
