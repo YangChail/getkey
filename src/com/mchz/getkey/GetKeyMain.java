@@ -1,6 +1,5 @@
 package com.mchz.getkey;
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,17 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-
 public class GetKeyMain {
 
-	private static String					address		= "";
-	private static String					username	= "";
-	private static String					password	= "";
-	private static String					tempFile	= System.getProperty("user.dir") + File.separator
-																+ "connection.properties";
-	private static String					tableFile	= System.getProperty("user.dir") + File.separator + "table.txt";
-	private static HashMap<String, String>	tableKeyMap	= new HashMap<String, String>();
-	private static HashMap<String, String>	tableMap	= new HashMap<String, String>();
+	private static String address = "";
+	private static String username = "";
+	private static String password = "";
+	private static String tempFile = System.getProperty("user.dir") + File.separator + "connection.properties";
+	private static String tableFile = System.getProperty("user.dir") + File.separator + "table.txt";
+	private static HashMap<String, String> tableKeyMap = new HashMap<String, String>();
+	private static HashMap<String, String> tableMap = new HashMap<String, String>();
 
 	public static void main(String[] args) {
 		GetKeyMain getKeyMain = new GetKeyMain();
@@ -45,29 +42,29 @@ public class GetKeyMain {
 			List<String> pK = jdbcUtil.excutJDBCUtilQuery("select col.column_name "
 					+ "from dba_constraints con,dba_cons_columns col "
 					+ "where con.constraint_name=col.constraint_name and con.constraint_type='P' and con.owner=upper('"
-					+ owner + "') and col.table_name=upper('" + tableName + "')");
+					+ owner + "') and col.owner=upper('" + owner + "')and col.table_name=upper('" + tableName + "')");
 			if (!pK.isEmpty()) {
 				String pkStr = pK.get(0);
 				tableKeyMap.put(ownerTableName, pkStr + ",");
 				continue;
 			}
 			// 查询唯一键
-			List<String> Uk = jdbcUtil.excutJDBCUtilQuery("select col.column_name "
-					+ "from dba_constraints con,dba_cons_columns col "
-					+ "where con.constraint_name=col.constraint_name and con.constraint_type='U' and con.owner=upper('"
-					+ owner + "') and col.table_name=upper('" + tableName + "')");
+			List<String> Uk = jdbcUtil
+					.excutJDBCUtilQuery("select col.column_name " + "from dba_constraints con,dba_cons_columns col "
+							+ "where con.constraint_name=col.constraint_name and con.constraint_type='U' and con.owner=upper('"
+							+ owner + "') and col.table_name=upper('" + tableName + "')");
 			if (!Uk.isEmpty()) {
 				String strUk = "";
 				for (String strUk1 : Uk) {
-					
+
 					strUk += strUk1 + ",";
 				}
 				tableKeyMap.put(ownerTableName, strUk);
 				continue;
 			}
 			// 查询唯一索引
-			List<String> UIndex = jdbcUtil
-					.excutJDBCUtilQuery("select t.COLUMN_NAME from dba_ind_columns t,dba_indexes i where t.index_name = i.index_name and i.uniqueness='UNIQUE' and t.table_name='"
+			List<String> UIndex = jdbcUtil.excutJDBCUtilQuery(
+					"select t.COLUMN_NAME from dba_ind_columns t,dba_indexes i where t.index_name = i.index_name and i.uniqueness='UNIQUE' and t.table_name='"
 							+ tableName + "' and t.TABLE_OWNER='" + owner + "'");
 			if (!UIndex.isEmpty()) {
 				String strUIndex = "";
@@ -78,8 +75,8 @@ public class GetKeyMain {
 				continue;
 			}
 			// 查询索引
-			List<String> Index = jdbcUtil
-					.excutJDBCUtilQuery("select c.COLUMN_NAME from dba_indexes i,dba_ind_columns c where i.index_name=c.INDEX_NAME and i.table_name='"
+			List<String> Index = jdbcUtil.excutJDBCUtilQuery(
+					"select c.COLUMN_NAME from dba_indexes i,dba_ind_columns c where i.index_name=c.INDEX_NAME and i.table_name='"
 							+ tableName + "'and i.table_owner='" + owner + "'");
 			if (!Index.isEmpty()) {
 				String strIndex = "";
@@ -93,15 +90,14 @@ public class GetKeyMain {
 			List<String> all = jdbcUtil.excutJDBCUtilQuery("select COLUMN_NAME from DBA_TAB_COLS where TABLE_NAME = '"
 					+ tableName + "' and OWNER='" + owner + "'");
 			if (!all.isEmpty()) {
-				HashMap<String, String> coltype = jdbcUtil
-						.excutJDBCUtilQuery2("select t.COLUMN_NAME,t.DATA_TYPE from all_tab_columns t where Table_Name='"
-								+ tableName + "' and OWNER='" + owner + "'");
+				HashMap<String, String> coltype = jdbcUtil.excutJDBCUtilQuery2(
+						"select t.COLUMN_NAME,t.DATA_TYPE from all_tab_columns t where Table_Name='" + tableName
+								+ "' and OWNER='" + owner + "'");
 				String strall = "";
 				for (String str1 : all) {
 					String type = coltype.get(str1);
-					if (type.equalsIgnoreCase("BLOB") || type.equalsIgnoreCase("clob")
-							|| type.equalsIgnoreCase("nclob") || type.equalsIgnoreCase("long")
-							|| type.equalsIgnoreCase("long raw")) {
+					if (type.equalsIgnoreCase("BLOB") || type.equalsIgnoreCase("clob") || type.equalsIgnoreCase("nclob")
+							|| type.equalsIgnoreCase("long") || type.equalsIgnoreCase("long raw")) {
 						continue;
 					}
 					strall += str1 + ",";
@@ -114,8 +110,8 @@ public class GetKeyMain {
 		for (Map.Entry<String, String> entry : tableKeyMap.entrySet()) {
 			String tablename1 = entry.getKey();
 			String str1 = entry.getValue();
-			if(str1.endsWith(",")){
-				str1=str1.substring(0, str1.length() - 1);
+			if (str1.endsWith(",")) {
+				str1 = str1.substring(0, str1.length() - 1);
 			}
 			String messege = tablename1 + ";" + str1;
 			WriteMessegeToLog.writeToLog(messege, "tableSuccess.log");
@@ -153,9 +149,10 @@ public class GetKeyMain {
 				if (tableMap.get(str) == null) {
 					tableMap.put(str, " ");
 				}
-			};
+			}
+			;
 		} catch (IOException e) {
 			e.printStackTrace();
-		}// file为文件的路径+文件名称+文件后缀
+		} // file为文件的路径+文件名称+文件后缀
 	}
 }
