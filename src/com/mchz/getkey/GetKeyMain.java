@@ -49,6 +49,7 @@ public class GetKeyMain {
 					pkStr+=str+",";
 				}
 				tableKeyMap.put(ownerTableName, pkStr);
+				
 				continue;
 			}
 			// 查询唯一键
