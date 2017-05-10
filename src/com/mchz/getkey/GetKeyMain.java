@@ -44,8 +44,11 @@ public class GetKeyMain {
 					+ "where con.constraint_name=col.constraint_name and con.constraint_type='P' and con.owner=upper('"
 					+ owner + "') and col.owner=upper('" + owner + "')and col.table_name=upper('" + tableName + "')");
 			if (!pK.isEmpty()) {
-				String pkStr = pK.get(0);
-				tableKeyMap.put(ownerTableName, pkStr + ",");
+				String pkStr="";
+				for(String str:pK){
+					pkStr+=str+",";
+				}
+				tableKeyMap.put(ownerTableName, pkStr);
 				continue;
 			}
 			// 查询唯一键
